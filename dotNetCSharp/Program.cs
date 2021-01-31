@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
-using System.Net.Http.Headers;
 using dotNetCSharp.DataAlignment;
 
 namespace dotNetCSharp
@@ -11,7 +10,7 @@ namespace dotNetCSharp
     {
         static void Main(string[] args)
         {
-            const int pointCount = 1000000;
+            const int pointCount = 10000;
             DoWork(new DataAligner(GenerateData(pointCount), pointCount, 0.001d));
             DoWork(new DataAlignerDict(GenerateData(pointCount), pointCount));
         }
@@ -20,8 +19,11 @@ namespace dotNetCSharp
         {
             var sw = new Stopwatch();
             sw.Start();
+            var result = da.Align().ToList();
+            sw.Stop();
+            
             var dict = new Dictionary<int, int>();
-            foreach (var point in da.Align())
+            foreach (var point in result)
             {
                 int count;
                 if (dict.TryGetValue(point.Count, out count))
@@ -34,7 +36,7 @@ namespace dotNetCSharp
                     dict.Add(point.Count, 1);
                 }
             }
-            sw.Stop();
+            
 
             Console.WriteLine($"{sw.ElapsedMilliseconds}");
             Console.WriteLine();
@@ -52,7 +54,7 @@ namespace dotNetCSharp
             var sg = new SequenceGenerator(10);
             for (var i = 0; i < count; ++i)
             {
-                result.Add(sg.Generate(pointCount));
+                result.Add(sg.Generate(pointCount).ToList());
             }
 
             return result;
